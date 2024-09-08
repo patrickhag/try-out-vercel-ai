@@ -1,20 +1,23 @@
 'use client'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Label } from '@/components/ui/label'
-import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { ChangeEvent, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { PromptSchema } from '@/validations/prompSchema'
 import { PromptType } from '@/types'
 import { useCreateQuestions } from '@/hooks'
 import { Loader } from '@/components/Loader'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css' // Include the Quill styling
+import CustomizeType from '@/components/CustomizeType'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export default function Home() {
   const { register, handleSubmit } = useForm<PromptType>({
@@ -22,11 +25,9 @@ export default function Home() {
   })
 
   const addTodoMutation = useCreateQuestions()
-  const [value, setValue] = useState('')
 
-  const onSubmit: SubmitHandler<PromptType> = (userPrompt) => {
-    addTodoMutation.mutate(userPrompt)
-    // console.log(userPrompt)
+  const onSubmit: SubmitHandler<PromptType> = (data) => {
+    addTodoMutation.mutate(data)
   }
 
   return (
@@ -43,25 +44,35 @@ export default function Home() {
             id='topic'
             {...register('topic')}
           />
-          {/* <Textarea
+          <Textarea
             placeholder='Task description'
             className='h-24'
             id='description'
             {...register('description', { required: false })}
-            > */}
-          <ReactQuill
-            value={value}
-            onChange={setValue}
-            className='rounded-md overflow-hidden border border-gray-300 border-input bg-transparent '
           />
-
+          <div className='mt-3 flex'>
+            <Select>
+              <SelectTrigger>
+                <SelectValue placeholder='Select level of difficulty' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Difficulty</SelectLabel>
+                  <SelectItem value='easy'>Easy</SelectItem>
+                  <SelectItem value='medium'>Medium</SelectItem>
+                  <SelectItem value='hard'>Hard</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <CustomizeType />
+          </div>
           <Button
             type='submit'
             className='my-5 w-full'
             disabled={addTodoMutation.isPending}
           >
             {addTodoMutation.isPending ? (
-              <Loader text='generating...' />
+              <Loader text='Generating...' />
             ) : (
               'Generate'
             )}

@@ -2,12 +2,12 @@ import React from 'react'
 import '@/app/globals.css'
 import { LuLoader2 } from 'react-icons/lu'
 
-type Prop = {
+type LoaderProps = {
   text?: string
   typeOfLoader?: boolean
 }
 
-export const Loader = ({ text, typeOfLoader }: Prop) => {
+export const Loader = ({ text, typeOfLoader }: LoaderProps) => {
   return (
     <div className='flex items-center'>
       <LuLoader2

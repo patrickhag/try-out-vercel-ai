@@ -11,7 +11,6 @@ export async function POST(req: NextRequest) {
       Topic: ${topic}.
       Description: ${description}. Ensure each question has a unique UUID for its ID. For the question choices make sure that they have unique UUIDs as well.`
 
-  console.log(userPrompt)
   try {
     const anthropic = createAnthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
