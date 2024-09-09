@@ -26,12 +26,9 @@ export default function Home() {
 
   const addTodoMutation = useCreateQuestions()
 
-  // Handle form submission
-  const onSubmit: SubmitHandler<PromptType> = (data) => {
-    const customInputs = getValues() // Get all form values
-    console.log('Form Data:', customInputs) // Log all input data including custom inputs
+  const onSubmit: SubmitHandler<PromptType> = () => {
+    const customInputs = getValues()
     addTodoMutation.mutate(customInputs)
-    // console.log(data)
   }
 
   return (
@@ -55,7 +52,6 @@ export default function Home() {
             {...register('description', { required: false })}
           />
 
-          {/* Select component */}
           <div className='mt-3 flex'>
             <Select onValueChange={(value) => setValue('difficulty', value)}>
               <SelectTrigger>
@@ -71,7 +67,6 @@ export default function Home() {
               </SelectContent>
             </Select>
 
-            {/* Pass form methods to CustomizedType */}
             <CustomizeType register={register} />
           </div>
 

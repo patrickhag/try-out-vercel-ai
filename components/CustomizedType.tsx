@@ -6,7 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { UseFormRegister, UseFormSetValue } from 'react-hook-form'
+import { UseFormRegister } from 'react-hook-form'
 
 interface CustomizeTypeProps {
   register: UseFormRegister<any>
