@@ -8,7 +8,7 @@ import { PromptSchema } from '@/validations/prompSchema'
 import { PromptType } from '@/types'
 import { useCreateQuestions } from '@/hooks'
 import { Loader } from '@/components/Loader'
-import CustomizeType from '@/components/CustomizeType'
+import CustomizeType from '@/components/CustomizedType'
 import {
   Select,
   SelectContent,
@@ -20,14 +20,18 @@ import {
 } from '@/components/ui/select'
 
 export default function Home() {
-  const { register, handleSubmit } = useForm<PromptType>({
+  const { register, handleSubmit, setValue, getValues } = useForm<PromptType>({
     resolver: zodResolver(PromptSchema),
   })
 
   const addTodoMutation = useCreateQuestions()
 
+  // Handle form submission
   const onSubmit: SubmitHandler<PromptType> = (data) => {
-    addTodoMutation.mutate(data)
+    const customInputs = getValues() // Get all form values
+    console.log('Form Data:', customInputs) // Log all input data including custom inputs
+    addTodoMutation.mutate(customInputs)
+    // console.log(data)
   }
 
   return (
@@ -50,8 +54,10 @@ export default function Home() {
             id='description'
             {...register('description', { required: false })}
           />
+
+          {/* Select component */}
           <div className='mt-3 flex'>
-            <Select>
+            <Select onValueChange={(value) => setValue('difficulty', value)}>
               <SelectTrigger>
                 <SelectValue placeholder='Select level of difficulty' />
               </SelectTrigger>
@@ -64,8 +70,11 @@ export default function Home() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <CustomizeType />
+
+            {/* Pass form methods to CustomizedType */}
+            <CustomizeType register={register} />
           </div>
+
           <Button
             type='submit'
             className='my-5 w-full'

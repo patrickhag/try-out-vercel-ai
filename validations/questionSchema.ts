@@ -11,16 +11,19 @@ enum QuestionType {
   DropDown = 'drop down',
 }
 
+export const DifficultyEnum = z.enum(['EASY', 'MEDIUM', 'HARD'])
+
 const QuestionChoiceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   choice: z.string(),
   isCorrect: z.boolean(),
 })
 
 const BaseQuestionSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   title: z.string(),
   description: z.string().optional(),
+  expectedAnswer: z.string(),
   version: z.number(),
   orderIndex: z.number(),
 })

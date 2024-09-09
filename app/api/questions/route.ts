@@ -1,15 +1,43 @@
-import { questionSchema } from '@/validations/questionSchema'
+import { PromptType } from '@/types'
+import { questionSchema, DifficultyEnum } from '@/validations/questionSchema'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { generateObject } from 'ai'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 export async function POST(req: NextRequest) {
-  const { topic, description } = await req.json()
+  const { topic, description, difficulty, questionTypes } = await req.json()
+
+  const questionTypesArray: string[] = []
+
+  Object.keys(questionTypes).forEach((key) => {
+    if (questionTypes[key]) {
+      questionTypesArray.push(`${key}: ${questionTypes[key]}`)
+    }
+  })
 
   const userPrompt = `
-      Topic: ${topic}.
-      Description: ${description}. Ensure each question has a unique UUID for its ID. For the question choices make sure that they have unique UUIDs as well.`
+  You are tasked with generating a set of questions for the following topic:
+  
+  Topic: "${topic}"
+  Description: "${description}"
+  
+  The level of difficulty for the questions should be "${difficulty}".
+  
+  For each question, ensure the following:
+  1. Each question must have a unique UUID as its identifier.
+  2. If the question includes choices (e.g., multiple-choice or checkbox), each choice must also have a unique UUID as well.
+  
+  The following types of questions are required:
+  ${
+    questionTypesArray.length
+      ? questionTypesArray.join('\n  ')
+      : 'No specific question types provided'
+  }
+  
+  Please generate questions accordingly.
+`
+  console.log(userPrompt)
 
   try {
     const anthropic = createAnthropic({
@@ -19,7 +47,7 @@ export async function POST(req: NextRequest) {
       model: anthropic('claude-3-5-sonnet-20240620', {
         cacheControl: true,
       }),
-      schema: z.object({ questionSchema }),
+      schema: z.object({ levelOfDifficulty: DifficultyEnum, questionSchema }),
       prompt: userPrompt,
     })
     return NextResponse.json({ data: data, status: 200 })
