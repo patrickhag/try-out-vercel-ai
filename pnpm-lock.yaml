@@ -71,6 +71,9 @@ dependencies:
   react:
     specifier: ^18
     version: 18.3.1
+  react-codemirror2:
+    specifier: ^8.0.0
+    version: 8.0.0(codemirror@5.65.17)(react@18.3.1)
   react-dom:
     specifier: ^18
     version: 18.3.1(react@18.3.1)
@@ -2236,6 +2239,10 @@ packages:
       acorn: 8.12.1
       estree-walker: 3.0.3
       periscopic: 3.1.0
+    dev: false
+
+  /codemirror@5.65.17:
+    resolution: {integrity: sha512-1zOsUx3lzAOu/gnMAZkQ9kpIHcPYOc9y1Fbm2UVk5UBPkdq380nhkelG0qUwm1f7wPvTbndu9ZYlug35EwAZRQ==}
     dev: false
 
   /color-convert@2.0.1:
@@ -4685,6 +4692,16 @@ packages:
       extend: 3.0.2
       parchment: 1.1.4
       quill-delta: 3.6.3
+    dev: false
+
+  /react-codemirror2@8.0.0(codemirror@5.65.17)(react@18.3.1):
+    resolution: {integrity: sha512-JIbhXoghvX0BrasIoCQvRxBPIU78plfjF1Buz0gaMFvZXwEDjkCYBkQhucoOtudQ7ikbB1jJUnmCsutElti7yA==}
+    peerDependencies:
+      codemirror: 5.x
+      react: '>=15.5 <=18.x'
+    dependencies:
+      codemirror: 5.65.17
+      react: 18.3.1
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):

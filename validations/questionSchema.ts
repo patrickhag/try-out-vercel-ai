@@ -1,28 +1,31 @@
 import { z } from 'zod'
 
-enum QuestionType {
+export enum QuestionType {
   Text = 'text',
   Checkbox = 'checkbox',
   Paragraph = 'paragraph',
-  MultipleChoice = 'multiple choice',
+  MultipleChoice = 'multipleChoice',
   Code = 'code',
   Range = 'range',
-  LinearScale = 'linear scale',
-  DropDown = 'drop down',
+  LinearScale = 'linearScale',
+  DropDown = 'dropdown',
 }
 
-export const DifficultyEnum = z.enum(['EASY', 'MEDIUM', 'HARD'])
+export const AddOnInfoSchema = z.object({
+  task: z.string(),
+  difficulty: z.enum(['Easy', 'Medium', 'Hard']),
+})
 
 const QuestionChoiceSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   choice: z.string(),
   isCorrect: z.boolean(),
 })
 
 const BaseQuestionSchema = z.object({
-  id: z.string(),
+  id: z.string().uuid(),
   title: z.string(),
-  description: z.string().optional(),
+  description: z.string(),
   expectedAnswer: z.string(),
   version: z.number(),
   orderIndex: z.number(),
@@ -30,9 +33,6 @@ const BaseQuestionSchema = z.object({
 
 const TextQuestionSchema = BaseQuestionSchema.extend({
   type: z.literal(QuestionType.Text),
-  metadata: z.object({
-    automatedResponse: z.string(),
-  }),
 })
 
 const CheckboxQuestionSchema = BaseQuestionSchema.extend({
@@ -42,9 +42,6 @@ const CheckboxQuestionSchema = BaseQuestionSchema.extend({
 
 const ParagraphQuestionSchema = BaseQuestionSchema.extend({
   type: z.literal(QuestionType.Paragraph),
-  metadata: z.object({
-    automatedResponse: z.string(),
-  }),
 })
 
 const MultipleChoiceQuestionSchema = BaseQuestionSchema.extend({

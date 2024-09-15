@@ -28,6 +28,7 @@ export default function Home() {
 
   const onSubmit: SubmitHandler<PromptType> = () => {
     const customInputs = getValues()
+    // console.log(customInputs)
     addTodoMutation.mutate(customInputs)
   }
 
