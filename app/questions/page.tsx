@@ -20,13 +20,27 @@ import 'codemirror/theme/material.css'
 import 'codemirror/mode/javascript/javascript'
 import 'codemirror/theme/neat.css'
 import { localData } from '@/lib/localData'
+import { useSendQuestions } from '@/hooks'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { calculateAverage } from '@/lib/utils'
 
 export default function Questionnaire() {
   const queryClient = useQueryClient()
   queryClient.setQueryData(['questions'], localData)
   const cachedData: any = queryClient.getQueryData(['questions'])
+  const [openDialog, setOpenDialog] = useState(false)
+  const [average, setAverage] = useState(null)
 
-  const [answers, setAnswers] = useState<Record<string, any>>({})
+  const [answers, setAnswers] = useState<any>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -43,10 +57,16 @@ export default function Questionnaire() {
   }, [cachedData])
 
   const handleAnswerChange = (questionId: string, value: any) => {
-    setAnswers((prev) => ({
+    setAnswers((prev: any) => ({
       ...prev,
       [questionId]: value,
     }))
+  }
+
+  const markUserMutation = useSendQuestions(setOpenDialog, setAverage)
+
+  const handleCorrectness = () => {
+    markUserMutation.mutate(answers)
   }
 
   const renderQuestion = (question: any) => {
@@ -253,15 +273,31 @@ export default function Questionnaire() {
         <Button variant='link' onClick={() => router.back()}>
           GO BACK
         </Button>
-        <Button
-          className='bg-green-500 text-white'
-          onClick={() => {
-            console.log(answers)
-          }}
-        >
-          SUBMIT
+        <Button className='bg-green-500 text-white' onClick={handleCorrectness}>
+          {markUserMutation.isPending ? 'LOADING...' : 'SUBMIT'}
         </Button>
       </div>
+      {markUserMutation.isSuccess && (
+        <AlertDialog open={openDialog}>
+          <AlertDialogContent className='w-[380px] shadow'>
+            <AlertDialogHeader>
+              <AlertDialogTitle className='text-center text-2xl'>
+                Marks
+              </AlertDialogTitle>
+              <AlertDialogDescription className='text-center'>
+                You&apos;ve got{' '}
+                <span className='text-gray-600 text-2xl'>{average}/100</span>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setOpenDialog(false)}>
+                Close
+              </AlertDialogCancel>
+              <AlertDialogAction>See feedback</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   )
 }

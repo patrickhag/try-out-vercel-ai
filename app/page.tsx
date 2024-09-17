@@ -24,12 +24,11 @@ export default function Home() {
     resolver: zodResolver(PromptSchema),
   })
 
-  const addTodoMutation = useCreateQuestions()
+  const createMutation = useCreateQuestions()
 
   const onSubmit: SubmitHandler<PromptType> = () => {
     const customInputs = getValues()
-    // console.log(customInputs)
-    addTodoMutation.mutate(customInputs)
+    createMutation.mutate(customInputs)
   }
 
   return (
@@ -74,9 +73,9 @@ export default function Home() {
           <Button
             type='submit'
             className='my-5 w-full'
-            disabled={addTodoMutation.isPending}
+            disabled={createMutation.isPending}
           >
-            {addTodoMutation.isPending ? (
+            {createMutation.isPending ? (
               <Loader text='Generating...' />
             ) : (
               'Generate'

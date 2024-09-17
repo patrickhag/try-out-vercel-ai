@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createOpenAI } from '@ai-sdk/openai'
 import { localData } from '@/lib/localData'
+import { markingSchema } from '@/validations/feedbackSchema'
 
 export async function POST(req: NextRequest) {
   const { topic, description, difficulty, questionTypes } = await req.json()
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       }),
       prompt: userPrompt,
     })
-    console.log(JSON.stringify(data, null, 2))
+
     return NextResponse.json({ data: data, status: 200 })
   } catch (error) {
     if (error instanceof Error) {
@@ -61,93 +62,85 @@ export async function POST(req: NextRequest) {
     NextResponse.json({ error: 'Error generating questions', status: 500 })
   }
 }
-
-// route.ts
 export async function PUT(req: NextRequest) {
   const { userAnswers } = await req.json()
 
-  // This is the imposed data from the backend (example provided earlier)
+  let markingPrompt = `You are a ${localData.AddOnInfoSchema.task} expert tasked with evaluating student answers. The student's answers are given below, along with the expected correct answers. For each question, provide a score and constructive feedback. The score should be based on a scale defined by the question type, and the feedback should help the student understand how they performed. Here's the breakdown:
 
-  // Step 1: Generate AI prompt by comparing user answers with expected answers
-  let prompt = `Suppose you're a renowed teacher in ${localData.AddOnInfoSchema.task}. And you are tasked with evaluating a set of answers provided by a user in response to a questionnaire. Below are the questions, the user's answers, and the expected answers. Please provide feedback for each answer, so for checkbox and multiple-choice questions look at the user's answers and give him/her straight feedback according to what's correct, but for text and paragraphs type questions make a good judgement like a teacher.\n\n`
+  1. For "text" or "paragraph" questions: Evaluate the relevance, depth, and accuracy of the response.
+  2. For "checkbox", "multiple choice", and "dropdown" questions: Indicate whether the answer is correct and provide reasoning if needed.
+  3. For "code" questions: Evaluate the accuracy, efficiency, and best practices in the code.
+  4. For "linear scale" questions: Compare the student's rating to the expected range and provide feedback.
+
+  Below are the questions, expected answers, and the student's responses.
+
+  `
 
   localData.questionSchema.forEach((question) => {
     const userAnswer = userAnswers[question.id]
-    const expectedAnswer = question.expectedAnswer
-
-    // Step 2: Handle different question types when comparing answers
-    let comparisonResult = ''
+    markingPrompt += `Question: ${question.title}\n`
+    markingPrompt += `Description: ${question.description}\n`
+    markingPrompt += `Question Type: ${question.type}\n`
+    markingPrompt += `Student's Answer: ${JSON.stringify(userAnswer)}\n`
 
     switch (question.type) {
       case 'text':
+        markingPrompt += `Evaluation: Evaluate the answer based on relevance and clarity. Provide a score out of ${question.score}.\n`
+        break
       case 'paragraph':
-        comparisonResult =
-          "Compare the user's answer to the expected answer. like if you were the teacher who reasonates."
+        markingPrompt += `Evaluation: Evaluate the answer based on relevance and clarity. Provide a score out of ${question.score}.\n`
         break
-
       case 'checkbox':
-        // Compare arrays for checkbox type questions
-        const correctChoices = question.choices?.filter(
-          (choice) => choice.isCorrect
-        )
-        // const isCorrectCheckbox =
-        //   JSON.stringify(userAnswer.sort()) ===
-        //   JSON.stringify(correctChoices.sort())
-        comparisonResult = 'Be specific with what the correct answer is'
+        markingPrompt += `Expected Answer: ${JSON.stringify(
+          question.choices?.filter((c) => c.isCorrect).map((c) => c.choice)
+        )}\n`
+        markingPrompt += `Evaluation: Score the answer based on how many correct choices were selected. Provide a score out of ${question.score}.\n`
         break
-
       case 'multipleChoice':
-        // Compare single-choice answers
-        const correctChoice = question.choices?.find((choice) => choice.choice)
-        comparisonResult = 'Be specific with the correct answer is'
-        //   userAnswer === correctChoice
-        //     ? 'Correct'
-        //     : `Incorrect. The correct answer is: "${correctChoice}".`
-        break
-
-      case 'linearScale':
-        // Linear scale comparison (exact or close match)
-        comparisonResult =
-          "On linear scale judge the user's answers based on text and description type answers"
-        // userAnswer === expectedAnswer
-        //   ? 'Correct'
-        //   : `Incorrect. The correct answer is: "${expectedAnswer}".`
-        break
-
-      case 'range':
-        // Range type: Check if the answer is within an acceptable range or exactly correct
-        comparisonResult =
-          'Check if the answer is within an acceptable range or exactly correct'
-        // userAnswer === expectedAnswer
-        //   ? 'Correct'
-        //   : `Incorrect. The expected range is: "${question.metadata?.range.min}-${question.metadata.range.max}" and the correct answer is "${expectedAnswer}".`
+        markingPrompt += `Expected Answer: ${
+          question.choices?.find((c) => c.isCorrect)?.choice
+        }\n`
+        markingPrompt += `Evaluation: Determine if the answer is correct and provide a score out of ${question.score}.\n`
         break
       case 'code':
-        comparisonResult = "Judge the user's code based on what might work"
-
-      case 'dropdown':
-        comparisonResult =
-          'Be specific with what the correct answer is or might work'
-        // userAnswer === expectedAnswer
-        //   ? 'Correct'
-        //   : `Incorrect. The correct answer is: "${expectedAnswer}".`
+        markingPrompt += `Expected Code: ${question.metadata?.codesInfo?.codeQuestion}\n`
+        markingPrompt += `Evaluation: Assess the code for correctness and best practices. Provide a score out of ${question.score}.\n`
         break
-
+      case 'linearScale':
+        markingPrompt += `Expected Scale: 1 to ${question.metadata?.linearScale?.toRangeValue}\n`
+        markingPrompt += `Evaluation: Compare the student's rating to the expected scale and provide a score out of ${question.score}.\n`
+        break
+      case 'dropdown':
+        markingPrompt += `Expected Answer: ${
+          question.choices?.find((c) => c.isCorrect)?.choice
+        }\n`
+        markingPrompt += `Evaluation: Provide a score based on correctness.\n`
+        break
       default:
-        comparisonResult = 'Unknown question type'
+        markingPrompt += `Evaluation: Unrecognized question type.\n`
     }
-
-    // Step 3: Append to the prompt
-    prompt += `title: ${question.title}\n`
-    prompt += `description: ${question.description}\n`
-    prompt += `type: ${question.type}\n`
-    prompt += `User's Answer: ${JSON.stringify(userAnswer)}\n`
-    prompt += `Expected Answer: ${expectedAnswer}\n`
-    prompt += `Evaluation: ${comparisonResult}\n\n`
+    markingPrompt += '\n'
   })
 
-  console.log(prompt)
+  try {
+    const openai = createOpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
 
-  // Step 4: Return the AI prompt in the response
-  return NextResponse.json({ prompt, status: 200 })
+    const { object: data } = await generateObject({
+      model: openai('gpt-4o'),
+      schema: z.object({ markingSchema }),
+      prompt: markingPrompt,
+    })
+
+    return NextResponse.json({
+      data,
+      status: 200,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message)
+    }
+    NextResponse.json({ error: 'Error generating questions', status: 500 })
+  }
 }

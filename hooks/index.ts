@@ -1,3 +1,4 @@
+import { calculateAverage } from '@/lib/utils'
 import { PromptType } from '@/types'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
@@ -13,6 +14,23 @@ export const useCreateQuestions = () => {
     onSuccess: ({ data }) => {
       queryClient.setQueryData(['questions'], data)
       router.push('/questions')
+    },
+  })
+}
+
+export const useSendQuestions = (
+  setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>,
+  setAverage: any
+) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (userAnswers) => {
+      return axios.put('/api/questions', { userAnswers })
+    },
+    onSuccess: ({ data }) => {
+      const average = calculateAverage(data)
+      setAverage(average)
+      setOpenDialog(true)
     },
   })
 }

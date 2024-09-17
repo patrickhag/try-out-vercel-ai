@@ -8,122 +8,110 @@ export const localData = {
       id: '1a2b3c4d-5678-90ab-cdef-1234567890ab',
       title: 'What is SEO?',
       description:
-        'Explain the concept of Search Engine Optimization and its importance in digital marketing.',
-      expectedAnswer:
-        'SEO stands for Search Engine Optimization. It is the practice of increasing the quantity and quality of traffic to your website through organic search engine results.',
+        'Explain the term SEO and its importance in digital marketing.',
       version: 1,
       orderIndex: 0,
       type: 'text',
+      score: 5,
     },
     {
-      id: '2b3c4d5e-6789-01bc-def2-2345678901bc',
+      id: '2b3c4d5e-6789-01bc-def2-3456789012bc',
       title: 'Describe a successful social media campaign.',
       description:
-        'Write a detailed description of a social media campaign that you consider successful. Include the goals, strategies, and outcomes.',
-      expectedAnswer:
-        'A successful social media campaign example is the ALS Ice Bucket Challenge. The goal was to raise awareness and funds for ALS research. The strategy involved participants filming themselves dumping ice water over their heads and challenging others to do the same. The outcome was a viral campaign that raised over $115 million.',
+        'Provide a detailed description of a social media campaign that you consider successful. Explain why it was successful and what strategies were used.',
       version: 1,
       orderIndex: 1,
       type: 'paragraph',
+      score: 5,
     },
     {
-      id: '3c4d5e6f-7890-12cd-ef34-3456789012cd',
+      id: '3c4d5e6f-7890-12cd-ef34-5678901234cd',
       title:
         'Which of the following are components of a digital marketing strategy?',
       description: 'Select all that apply.',
-      expectedAnswer:
-        'SEO, Content Marketing, Social Media Marketing, Email Marketing',
       version: 1,
       orderIndex: 2,
       type: 'checkbox',
       choices: [
         {
-          id: '4d5e6f70-8901-23de-f456-4567890123de',
+          id: '4d5e6f70-8901-23de-f456-7890123456de',
           choice: 'SEO',
           isCorrect: true,
         },
         {
-          id: '5e6f7081-9012-34ef-5678-5678901234ef',
+          id: '5e6f7081-9012-34ef-5678-9012345678ef',
+          choice: 'PPC Advertising',
+          isCorrect: true,
+        },
+        {
+          id: '6f708192-0123-45f0-6789-0123456789f0',
+          choice: 'Traditional TV Advertising',
+          isCorrect: false,
+        },
+        {
+          id: '70819203-1234-56a1-7890-1234567890a1',
           choice: 'Content Marketing',
           isCorrect: true,
         },
-        {
-          id: '6f708192-0123-45f0-6789-6789012345f0',
-          choice: 'Social Media Marketing',
-          isCorrect: true,
-        },
-        {
-          id: '708192a3-1234-56f1-7890-7890123456f1',
-          choice: 'Email Marketing',
-          isCorrect: true,
-        },
-        {
-          id: '8192a3b4-2345-67f2-8901-8901234567f2',
-          choice: 'Direct Mail',
-          isCorrect: false,
-        },
       ],
+      score: 5,
     },
     {
-      id: '4d5e6f70-8901-23de-f456-4567890123de',
+      id: '4d5e6f70-8901-23de-f456-7890123456de',
       title: 'What is the primary goal of content marketing?',
       description: 'Choose the best answer.',
-      expectedAnswer:
-        'To attract and retain a clearly defined audience by creating and distributing valuable, relevant, and consistent content.',
       version: 1,
       orderIndex: 3,
       type: 'multipleChoice',
       choices: [
         {
-          id: '5e6f7081-9012-34ef-5678-5678901234ef',
-          choice:
-            'To attract and retain a clearly defined audience by creating and distributing valuable, relevant, and consistent content.',
+          id: '5e6f7081-9012-34ef-5678-9012345678ef',
+          choice: 'To entertain the audience',
+          isCorrect: false,
+        },
+        {
+          id: '6f708192-0123-45f0-6789-0123456789f0',
+          choice: 'To sell products directly',
+          isCorrect: false,
+        },
+        {
+          id: '70819203-1234-56a1-7890-1234567890a1',
+          choice: 'To provide valuable information and build trust',
           isCorrect: true,
         },
         {
-          id: '6f708192-0123-45f0-6789-6789012345f0',
-          choice: 'To sell products directly through online ads.',
-          isCorrect: false,
-        },
-        {
-          id: '708192a3-1234-56f1-7890-7890123456f1',
-          choice: 'To increase website traffic through paid advertising.',
-          isCorrect: false,
-        },
-        {
-          id: '8192a3b4-2345-67f2-8901-8901234567f2',
-          choice: 'To engage with customers through social media posts.',
+          id: '81920314-2345-67b2-8901-2345678901b2',
+          choice: 'To increase website traffic quickly',
           isCorrect: false,
         },
       ],
+      score: 5,
     },
     {
-      id: '5e6f7081-9012-34ef-5678-5678901234ef',
-      title: 'Write a simple HTML code to create a call-to-action button.',
+      id: '5e6f7081-9012-34ef-5678-9012345678ef',
+      title: 'Write a simple HTML code for a call-to-action button.',
       description:
-        "Provide the HTML code for a button that says 'Click Here' and links to 'https://example.com'.",
-      expectedAnswer:
-        "<a href='https://example.com'><button>Click Here</button></a>",
+        "Create an HTML snippet for a call-to-action button that says 'Subscribe Now'.",
       version: 1,
       orderIndex: 4,
       type: 'code',
+      score: 5,
       metadata: {
         codesInfo: {
-          codeQuestion:
-            'Write a simple HTML code to create a call-to-action button.',
+          codeQuestion: '<button>Subscribe Now</button>',
           language: 'HTML',
         },
       },
     },
     {
-      id: '6f708192-0123-45f0-6789-6789012345f0',
+      id: '6f708192-0123-45f0-6789-0123456789f0',
       title: 'Rate your understanding of Google Analytics.',
       description:
         'On a scale from 1 to 5, how would you rate your understanding of Google Analytics?',
-      expectedAnswer: '3',
       version: 1,
       orderIndex: 5,
       type: 'linearScale',
+      score: 5,
       metadata: {
         linearScale: {
           toRangeValue: 5,
@@ -133,39 +121,34 @@ export const localData = {
       },
     },
     {
-      id: '708192a3-1234-56f1-7890-7890123456f1',
+      id: '70819203-1234-56a1-7890-1234567890a1',
       title: 'What is the ideal length for a blog post?',
-      description:
-        'Provide a range for the ideal length of a blog post in words.',
-      expectedAnswer: '1500-2000 words',
+      description: 'Specify the ideal length for a blog post in words.',
       version: 1,
       orderIndex: 6,
       type: 'range',
+      score: 5,
       metadata: {
         range: {
-          min: '1500',
+          min: '300',
           max: '2000',
         },
       },
     },
     {
-      id: '8192a3b4-2345-67f2-8901-8901234567f2',
-      title: 'Select the primary platform you use for social media marketing.',
-      description: 'Choose one from the list.',
-      expectedAnswer: 'Facebook',
+      id: '81920314-2345-67b2-8901-2345678901b2',
+      title:
+        'Select the most effective social media platform for B2B marketing.',
+      description:
+        'Choose the platform that you think is most effective for B2B marketing.',
       version: 1,
       orderIndex: 7,
       type: 'dropdown',
+      score: 5,
       metadata: {
         dropDown: {
           dataset: 'Social Media Platforms',
-          datasetData: [
-            'Facebook',
-            'Instagram',
-            'Twitter',
-            'LinkedIn',
-            'TikTok',
-          ],
+          datasetData: ['LinkedIn', 'Facebook', 'Twitter', 'Instagram'],
         },
       },
     },
