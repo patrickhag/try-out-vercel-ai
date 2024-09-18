@@ -4,16 +4,23 @@ import {
   integer,
   jsonb,
   pgEnum,
-  text,
+  uuid,
   boolean,
-  serial,
-  json,
 } from 'drizzle-orm/pg-core'
+
+const difficultyEnum = pgEnum('difficulty', ['EASY', 'MEDIUM', 'HARD'])
+
+export const tasks = pgTable('tasks', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  title: varchar('name').notNull(),
+  description: varchar('description'),
+  difficulty: difficultyEnum('difficulty').notNull(),
+})
 
 const questionTypeEnum = pgEnum('question_type', [
   'text',
-  'checkbox',
   'paragraph',
+  'checkbox',
   'multipleChoice',
   'code',
   'range',
@@ -22,38 +29,24 @@ const questionTypeEnum = pgEnum('question_type', [
 ])
 
 export const questions = pgTable('questions', {
-  id: varchar('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
   title: varchar('title').notNull(),
   description: varchar('description'),
-  expectedAnswer: varchar('expectedAnswer').notNull(),
   version: integer('version').notNull(),
-  orderIndex: integer('orderIndex').notNull(),
   type: questionTypeEnum('type').notNull(),
-  choices: jsonb('choices'),
+  score: integer('score').notNull(),
+  taskId: uuid('task_id').references(() => tasks.id),
 })
 
-// export const questions = pgTable('questions', {
-//   id: varchar('id', { length: 255 }).primaryKey(),
-//   title: varchar('title', { length: 255 }).notNull(),
-//   description: varchar('description'),
-//   expectedAnswer: varchar('expected_answer').notNull(),
-//   version: integer('version').notNull(),
-//   orderIndex: integer('order_index').notNull(),
-//   type: questionTypeEnum('type').notNull(),
-// });
+export const metadata = pgTable('metadata', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  metadata: jsonb('metadata'),
+  questionId: uuid('question_id').references(() => questions.id),
+})
 
-// // Table for question choices (for Checkbox & Multiple Choice)
-// export const questionChoices = pgTable('question_choices', {
-//   id: varchar('id', { length: 255 }).primaryKey(),
-//   questionId: varchar('question_id', { length: 255 }).references(() => questions.id),
-//   choice: text('choice').notNull(),
-//   isCorrect: boolean('is_correct').notNull(),
-// });
-
-// // Metadata for different question types
-// export const questionMetadata = pgTable('question_metadata', {
-//   id: serial('id').primaryKey(),
-//   questionId: varchar('question_id', { length: 255 }).references(() => questions.id),
-//   metadataType: varchar('metadata_type', { length: 255 }).notNull(),
-//   metadata: json('metadata').notNull(),
-// });
+export const choices = pgTable('choices', {
+  id: uuid('id').primaryKey().defaultRandom().notNull(),
+  choice: varchar('choice').notNull(),
+  isCorrect: boolean('isCorrect').notNull(),
+  questionId: uuid('question_id').references(() => questions.id),
+})

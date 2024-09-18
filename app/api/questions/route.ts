@@ -1,4 +1,4 @@
-import { questions } from '@/db/dbSchema'
+import { choices, metadata, questions, tasks } from '@/db/dbSchema'
 import { db } from '@/db/drizzle'
 import { questionSchema, AddOnInfoSchema } from '@/validations/questionSchema'
 import { generateObject } from 'ai'
@@ -39,7 +39,6 @@ export async function POST(req: NextRequest) {
   }
   Please generate questions accordingly.
 `
-
   try {
     const openai = createOpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -53,6 +52,53 @@ export async function POST(req: NextRequest) {
       }),
       prompt: userPrompt,
     })
+    console.log(JSON.stringify(data, null, 2))
+
+    await db.transaction(async (tx: any) => {
+      const insertedTask = await tx
+        .insert(tasks)
+        .values({
+          title: topic,
+          description: description,
+          difficulty: difficulty,
+        })
+        .returning({ id: tasks.id })
+
+      const taskId = insertedTask[0].id
+
+      for (const question of data.questionSchema) {
+        const insertedQuestion = await tx
+          .insert(questions)
+          .values({
+            taskId: taskId,
+            title: question.title,
+            description: question.description,
+            version: question.version,
+            type: question.type,
+            score: question.score,
+          })
+          .returning({ id: questions.id })
+
+        const questionId = insertedQuestion[0].id
+
+        if ('choices' in question && question.choices) {
+          for (const choice of question.choices) {
+            await tx.insert(choices).values({
+              choice: choice.choice,
+              isCorrect: choice.isCorrect,
+              questionId: questionId,
+            })
+          }
+        }
+
+        if ('metadata' in question && question.metadata) {
+          await tx.insert(metadata).values({
+            metadata: question.metadata,
+            questionId: questionId,
+          })
+        }
+      }
+    })
 
     return NextResponse.json({ data: data, status: 200 })
   } catch (error) {
@@ -62,6 +108,7 @@ export async function POST(req: NextRequest) {
     NextResponse.json({ error: 'Error generating questions', status: 500 })
   }
 }
+
 export async function PUT(req: NextRequest) {
   const { userAnswers } = await req.json()
 
@@ -78,7 +125,7 @@ export async function PUT(req: NextRequest) {
 
   localData.questionSchema.forEach((question) => {
     const userAnswer = userAnswers[question.id]
-    markingPrompt += `Question: ${question.title}\n`
+    markingPrompt += `Question: ${question.title}\n3`
     markingPrompt += `Description: ${question.description}\n`
     markingPrompt += `Question Type: ${question.type}\n`
     markingPrompt += `Student's Answer: ${JSON.stringify(userAnswer)}\n`

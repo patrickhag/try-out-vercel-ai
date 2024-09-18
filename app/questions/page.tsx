@@ -19,7 +19,6 @@ import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/material.css'
 import 'codemirror/mode/javascript/javascript'
 import 'codemirror/theme/neat.css'
-import { localData } from '@/lib/localData'
 import { useSendQuestions } from '@/hooks'
 import {
   AlertDialog,
@@ -31,11 +30,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { calculateAverage } from '@/lib/utils'
 
 export default function Questionnaire() {
   const queryClient = useQueryClient()
-  queryClient.setQueryData(['questions'], localData)
   const cachedData: any = queryClient.getQueryData(['questions'])
   const [openDialog, setOpenDialog] = useState(false)
   const [average, setAverage] = useState(null)
@@ -255,7 +252,7 @@ export default function Questionnaire() {
     <div className='p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg'>
       <h1 className='text-xl font-bold mb-4 text-center'>Questionnaire</h1>
 
-      {cachedData.questionSchema.map((question: any, index: number) => (
+      {cachedData.data.questionSchema.map((question: any, index: number) => (
         <div key={question.id} className='border rounded-lg p-4 mb-6'>
           <div className='flex justify-between items-center mb-3'>
             <div>

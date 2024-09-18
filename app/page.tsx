@@ -29,6 +29,7 @@ export default function Home() {
   const onSubmit: SubmitHandler<PromptType> = () => {
     const customInputs = getValues()
     createMutation.mutate(customInputs)
+    console.log(customInputs)
   }
 
   return (
@@ -60,9 +61,9 @@ export default function Home() {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Difficulty</SelectLabel>
-                  <SelectItem value='easy'>Easy</SelectItem>
-                  <SelectItem value='medium'>Medium</SelectItem>
-                  <SelectItem value='hard'>Hard</SelectItem>
+                  <SelectItem value='EASY'>Easy</SelectItem>
+                  <SelectItem value='MEDIUM'>Medium</SelectItem>
+                  <SelectItem value='HARD'>Hard</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

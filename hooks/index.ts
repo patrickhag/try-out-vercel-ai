@@ -22,7 +22,6 @@ export const useSendQuestions = (
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>,
   setAverage: any
 ) => {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (userAnswers) => {
       return axios.put('/api/questions', { userAnswers })
