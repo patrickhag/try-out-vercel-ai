@@ -4,10 +4,10 @@ export enum QuestionType {
   Text = 'text',
   Checkbox = 'checkbox',
   Paragraph = 'paragraph',
-  MultipleChoice = 'multipleChoice',
+  MultipleChoice = 'multiplechoice',
   Code = 'code',
   Range = 'range',
-  LinearScale = 'linearScale',
+  LinearScale = 'linearscale',
   DropDown = 'dropdown',
 }
 
@@ -97,12 +97,12 @@ export const AddOnInfoSchema = z.object({
 const QuestionSchema = z.discriminatedUnion('type', [
   TextQuestionSchema,
   ParagraphQuestionSchema,
-  CheckboxQuestionSchema,
-  MultipleChoiceQuestionSchema,
   CodeQuestionSchema,
   RangeQuestionSchema,
   LinearScaleQuestionSchema,
   DropDownQuestionSchema,
+  CheckboxQuestionSchema,
+  MultipleChoiceQuestionSchema,
 ])
 
 export const questionSchema = z.array(QuestionSchema)

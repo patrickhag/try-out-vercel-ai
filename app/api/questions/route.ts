@@ -1,4 +1,4 @@
-import { choices, metadata, questions, tasks } from '@/db/dbSchema'
+import { metadata, questions, tasks } from '@/db/dbSchema'
 import { db } from '@/db/drizzle'
 import { questionSchema, AddOnInfoSchema } from '@/validations/questionSchema'
 import { generateObject } from 'ai'
@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
       const taskId = insertedTask[0].id
 
       for (const question of data.questionSchema) {
+        console.log('Processing question:', JSON.stringify(question, null, 2))
         const insertedQuestion = await tx
           .insert(questions)
           .values({
@@ -75,21 +76,12 @@ export async function POST(req: NextRequest) {
             description: question.description,
             version: question.version,
             type: question.type,
+            choices: 'choices' in question ? question.choices : null,
             score: question.score,
           })
           .returning({ id: questions.id })
 
         const questionId = insertedQuestion[0].id
-
-        if ('choices' in question && question.choices) {
-          for (const choice of question.choices) {
-            await tx.insert(choices).values({
-              choice: choice.choice,
-              isCorrect: choice.isCorrect,
-              questionId: questionId,
-            })
-          }
-        }
 
         if ('metadata' in question && question.metadata) {
           await tx.insert(metadata).values({

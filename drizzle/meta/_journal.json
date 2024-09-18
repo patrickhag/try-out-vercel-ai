@@ -36,6 +36,20 @@
       "when": 1726661595061,
       "tag": "0004_rollback-my-choices-entity",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1726697597952,
+      "tag": "0005_remove-choices-attribute-to-questions-table",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1726698716942,
+      "tag": "0006_remove-non-null-constraint-on-choices-attr",
+      "breakpoints": true
     }
   ]
 }

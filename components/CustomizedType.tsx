@@ -60,7 +60,7 @@ export default function CustomizeType({ register }: CustomizeTypeProps) {
                 id='multipleChoice'
                 type='number'
                 className='col-span-2 h-8'
-                {...register('questionTypes.multipleChoice')}
+                {...register('questionTypes.multiplechoice')}
               />
             </div>
             <div className='grid grid-cols-3 items-center gap-4'>
@@ -78,7 +78,7 @@ export default function CustomizeType({ register }: CustomizeTypeProps) {
                 id='linearScale'
                 type='number'
                 className='col-span-2 h-8'
-                {...register('questionTypes.linearScale')}
+                {...register('questionTypes.linearscale')}
               />
             </div>
             <div className='grid grid-cols-3 items-center gap-4'>
