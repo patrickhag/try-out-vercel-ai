@@ -15,10 +15,6 @@ import {
 } from '@/components/ui/select'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/material.css'
-import 'codemirror/mode/javascript/javascript'
-import 'codemirror/theme/neat.css'
 import { useSendQuestions } from '@/hooks'
 import {
   AlertDialog,
@@ -30,10 +26,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Loader } from '@/components/Loader'
+import { localData } from '@/lib/localData'
 
 export default function Questionnaire() {
   const queryClient = useQueryClient()
   const cachedData: any = queryClient.getQueryData(['questions'])
+  // const cachedData: any = localData
   const [openDialog, setOpenDialog] = useState(false)
   const [average, setAverage] = useState(null)
 
@@ -128,7 +127,7 @@ export default function Questionnaire() {
             ))}
           </div>
         )
-      case 'multipleChoice':
+      case 'multiplechoice':
         return (
           <div className='space-y-2 mb-3'>
             <p className='my-3 ml-1 text-sm text-gray-500'>
@@ -163,7 +162,7 @@ export default function Questionnaire() {
             />
           </>
         )
-      case 'linearScale':
+      case 'linearscale':
         const { toRangeValue, fromRangeLabel, toRangeLabel } =
           question.metadata.linearScale
         return (
@@ -252,26 +251,28 @@ export default function Questionnaire() {
     <div className='p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg'>
       <h1 className='text-xl font-bold mb-4 text-center'>Questionnaire</h1>
 
-      {cachedData.data.questionSchema.map((question: any, index: number) => (
-        <div key={question.id} className='border rounded-lg p-4 mb-6'>
-          <div className='flex justify-between items-center mb-3'>
-            <div>
-              <h2 className='text-lg font-semibold'>
-                {index + 1}. {question.title}
-              </h2>
+      {cachedData.generatedQuestions.questionSchema.map(
+        (question: any, index: number) => (
+          <div key={question.id} className='border rounded-lg p-4 mb-6'>
+            <div className='flex justify-between items-center mb-3'>
+              <div>
+                <h2 className='text-lg font-semibold'>
+                  {index + 1}. {question.title}
+                </h2>
+              </div>
             </div>
-          </div>
 
-          {renderQuestion(question)}
-        </div>
-      ))}
+            {renderQuestion(question)}
+          </div>
+        )
+      )}
 
       <div className='flex justify-between items-center'>
         <Button variant='link' onClick={() => router.back()}>
           GO BACK
         </Button>
         <Button className='bg-green-500 text-white' onClick={handleCorrectness}>
-          {markUserMutation.isPending ? 'LOADING...' : 'SUBMIT'}
+          {markUserMutation.isPending ? <Loader text='Marking...' /> : 'SUBMIT'}
         </Button>
       </div>
       {markUserMutation.isSuccess && (
