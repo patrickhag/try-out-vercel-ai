@@ -4,14 +4,15 @@ export enum QuestionType {
   Text = 'text',
   Checkbox = 'checkbox',
   Paragraph = 'paragraph',
-  MultipleChoice = 'multipleChoice',
+  MultipleChoice = 'multiplechoice',
   Code = 'code',
   Range = 'range',
-  LinearScale = 'linearScale',
+  LinearScale = 'linearscale',
   DropDown = 'dropdown',
 }
 
 const BaseQuestionSchema = z.object({
+  id: z.string().uuid(),
   title: z.string(),
   description: z.string(),
   version: z.number(),
@@ -28,6 +29,7 @@ const ParagraphQuestionSchema = BaseQuestionSchema.extend({
 })
 
 const QuestionChoiceSchema = z.object({
+  id: z.string().uuid(),
   choice: z.string(),
   isCorrect: z.boolean(),
 })
@@ -97,12 +99,12 @@ export const AddOnInfoSchema = z.object({
 const QuestionSchema = z.discriminatedUnion('type', [
   TextQuestionSchema,
   ParagraphQuestionSchema,
-  CheckboxQuestionSchema,
-  MultipleChoiceQuestionSchema,
   CodeQuestionSchema,
   RangeQuestionSchema,
   LinearScaleQuestionSchema,
   DropDownQuestionSchema,
+  CheckboxQuestionSchema,
+  MultipleChoiceQuestionSchema,
 ])
 
 export const questionSchema = z.array(QuestionSchema)

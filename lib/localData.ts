@@ -62,7 +62,7 @@ export const localData = {
       description: 'Choose the best answer.',
       version: 1,
       orderIndex: 3,
-      type: 'multipleChoice',
+      type: 'multiplechoice',
       choices: [
         {
           id: '5e6f7081-9012-34ef-5678-9012345678ef',
@@ -110,7 +110,7 @@ export const localData = {
         'On a scale from 1 to 5, how would you rate your understanding of Google Analytics?',
       version: 1,
       orderIndex: 5,
-      type: 'linearScale',
+      type: 'linearscale',
       score: 5,
       metadata: {
         linearScale: {

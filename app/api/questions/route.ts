@@ -1,12 +1,16 @@
-import { choices, metadata, questions, tasks } from '@/db/dbSchema'
+import { metadata, questions, tasks } from '@/db/dbSchema'
 import { db } from '@/db/drizzle'
 import { questionSchema, AddOnInfoSchema } from '@/validations/questionSchema'
 import { generateObject } from 'ai'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createOpenAI } from '@ai-sdk/openai'
 import { localData } from '@/lib/localData'
 import { markingSchema } from '@/validations/feedbackSchema'
+import { createAnthropic } from '@ai-sdk/anthropic'
+
+const anthropic = createAnthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+})
 
 export async function POST(req: NextRequest) {
   const { topic, description, difficulty, questionTypes } = await req.json()
@@ -40,67 +44,16 @@ export async function POST(req: NextRequest) {
   Please generate questions accordingly.
 `
   try {
-    const openai = createOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-
-    const { object: data } = await generateObject({
-      model: openai('gpt-4o'),
+    const { object: generatedQuestions } = await generateObject({
+      model: anthropic('claude-3-5-sonnet-20240620'),
       schema: z.object({
         AddOnInfoSchema,
         questionSchema,
       }),
       prompt: userPrompt,
     })
-    console.log(JSON.stringify(data, null, 2))
 
-    await db.transaction(async (tx: any) => {
-      const insertedTask = await tx
-        .insert(tasks)
-        .values({
-          title: topic,
-          description: description,
-          difficulty: difficulty,
-        })
-        .returning({ id: tasks.id })
-
-      const taskId = insertedTask[0].id
-
-      for (const question of data.questionSchema) {
-        const insertedQuestion = await tx
-          .insert(questions)
-          .values({
-            taskId: taskId,
-            title: question.title,
-            description: question.description,
-            version: question.version,
-            type: question.type,
-            score: question.score,
-          })
-          .returning({ id: questions.id })
-
-        const questionId = insertedQuestion[0].id
-
-        if ('choices' in question && question.choices) {
-          for (const choice of question.choices) {
-            await tx.insert(choices).values({
-              choice: choice.choice,
-              isCorrect: choice.isCorrect,
-              questionId: questionId,
-            })
-          }
-        }
-
-        if ('metadata' in question && question.metadata) {
-          await tx.insert(metadata).values({
-            metadata: question.metadata,
-            questionId: questionId,
-          })
-        }
-      }
-    })
-
-    return NextResponse.json({ data: data, status: 200 })
+    return NextResponse.json({ generatedQuestions, status: 200 })
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message)
@@ -143,7 +96,7 @@ export async function PUT(req: NextRequest) {
         )}\n`
         markingPrompt += `Evaluation: Score the answer based on how many correct choices were selected. Provide a score out of ${question.score}.\n`
         break
-      case 'multipleChoice':
+      case 'multiplechoice':
         markingPrompt += `Expected Answer: ${
           question.choices?.find((c) => c.isCorrect)?.choice
         }\n`
@@ -153,7 +106,7 @@ export async function PUT(req: NextRequest) {
         markingPrompt += `Expected Code: ${question.metadata?.codesInfo?.codeQuestion}\n`
         markingPrompt += `Evaluation: Assess the code for correctness and best practices. Provide a score out of ${question.score}.\n`
         break
-      case 'linearScale':
+      case 'linearscale':
         markingPrompt += `Expected Scale: 1 to ${question.metadata?.linearScale?.toRangeValue}\n`
         markingPrompt += `Evaluation: Compare the student's rating to the expected scale and provide a score out of ${question.score}.\n`
         break
@@ -170,15 +123,13 @@ export async function PUT(req: NextRequest) {
   })
 
   try {
-    const openai = createOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-
     const { object: data } = await generateObject({
-      model: openai('gpt-4o'),
+      model: anthropic('claude-3-5-sonnet-20240620'),
       schema: z.object({ markingSchema }),
       prompt: markingPrompt,
     })
+
+    console.log(data)
 
     return NextResponse.json({
       data,
