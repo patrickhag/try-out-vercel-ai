@@ -12,10 +12,11 @@ export enum QuestionType {
 }
 
 const BaseQuestionSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   title: z.string(),
   description: z.string(),
   version: z.number(),
+  expectedAnswer: z.string(),
 })
 
 const TextQuestionSchema = BaseQuestionSchema.extend({
@@ -29,7 +30,7 @@ const ParagraphQuestionSchema = BaseQuestionSchema.extend({
 })
 
 const QuestionChoiceSchema = z.object({
-  id: z.string().uuid(),
+  id: z.string(),
   choice: z.string(),
   isCorrect: z.boolean(),
 })

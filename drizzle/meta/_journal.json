@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1726586188298,
+      "when": 1726756801411,
       "tag": "0000_init",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1726658082963,
-      "tag": "0001_remove-choices-attribute-to-questions-entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1726659397156,
-      "tag": "0002_removed-score-attribute-to-choices-entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1726660391396,
-      "tag": "0003_removed-choices-entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1726661595061,
-      "tag": "0004_rollback-my-choices-entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1726697597952,
-      "tag": "0005_remove-choices-attribute-to-questions-table",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1726698716942,
-      "tag": "0006_remove-non-null-constraint-on-choices-attr",
       "breakpoints": true
     }
   ]

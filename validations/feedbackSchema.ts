@@ -5,6 +5,6 @@ export const markingSchema = z.array(
     score: z.number(),
     questionName: z.string(),
     type: z.string(),
-    expectedAnswer: z.string(),
+    feedback: z.string(),
   })
 )
