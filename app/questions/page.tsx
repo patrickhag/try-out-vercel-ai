@@ -13,12 +13,10 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select'
-import { useRouter } from 'next/navigation'
-import { useQueryClient } from '@tanstack/react-query'
-import { useSendQuestions } from '@/hooks'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useGetQuestions, useSendQuestions } from '@/hooks'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -27,21 +25,23 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Loader } from '@/components/Loader'
-import { localData } from '@/lib/localData'
 
 export default function Questionnaire() {
-  const queryClient = useQueryClient()
-  const cachedData: any = queryClient.getQueryData(['questions'])
-  // const cachedData: any = localData
   const [openDialog, setOpenDialog] = useState(false)
   const [average, setAverage] = useState(null)
 
   const [answers, setAnswers] = useState<any>({})
   const router = useRouter()
 
+  const searchParams = useSearchParams()
+
+  const taskId = searchParams.get('taskId') as string
+
+  const { data, isLoading } = useGetQuestions(taskId)
+
   useEffect(() => {
-    if (cachedData && cachedData.questionSchema) {
-      const initialAnswers = cachedData.questionSchema.reduce(
+    if (data && data.questions) {
+      const initialAnswers = data.questions.reduce(
         (acc: Record<string, any>, question: any) => {
           acc[question.id] = ''
           return acc
@@ -50,7 +50,7 @@ export default function Questionnaire() {
       )
       setAnswers(initialAnswers)
     }
-  }, [cachedData])
+  }, [data])
 
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers((prev: any) => ({
@@ -62,7 +62,7 @@ export default function Questionnaire() {
   const markUserMutation = useSendQuestions(setOpenDialog, setAverage)
 
   const handleCorrectness = () => {
-    markUserMutation.mutate(answers)
+    markUserMutation.mutate({ answers, taskId })
   }
 
   const renderQuestion = (question: any) => {
@@ -245,56 +245,63 @@ export default function Questionnaire() {
     }
   }
 
-  if (!cachedData) return <p>No data available.</p>
-
   return (
-    <div className='p-6 max-w-2xl mx-auto bg-white shadow-md rounded-lg'>
-      <h1 className='text-xl font-bold mb-4 text-center'>Questionnaire</h1>
-
-      {cachedData.generatedQuestions.questionSchema.map(
-        (question: any, index: number) => (
-          <div key={question.id} className='border rounded-lg p-4 mb-6'>
-            <div className='flex justify-between items-center mb-3'>
-              <div>
-                <h2 className='text-lg font-semibold'>
-                  {index + 1}. {question.title}
-                </h2>
+    <div className='min-h-screen bg-gradient-to-r from-rose-100 to-teal-100 px-5'>
+      {isLoading ? (
+        <div className='grid place-items-center h-screen'>
+          <Loader text='Loading...' typeOfLoader='index' />
+        </div>
+      ) : (
+        <div className='p-6 max-w-2xl mx-auto shadow-md rounded-lg'>
+          <h1 className='text-xl font-bold mb-4 text-center'>Questionnaire</h1>
+          {data.questions?.map((question: any, index: number) => (
+            <div key={question.id} className='border rounded-lg p-4 mb-6'>
+              <div className='flex justify-between items-center mb-3'>
+                <div>
+                  <h2 className='text-lg font-semibold'>
+                    {index + 1}. {question.title}
+                  </h2>
+                </div>
               </div>
+
+              {renderQuestion(question)}
             </div>
-
-            {renderQuestion(question)}
+          ))}
+          <div className='flex justify-between items-center'>
+            <Button variant='link' onClick={() => router.back()}>
+              GO BACK
+            </Button>
+            <Button
+              className='bg-green-500 text-white'
+              onClick={handleCorrectness}
+              disabled={markUserMutation.isPending}
+            >
+              {markUserMutation.isPending ? (
+                <Loader text='Marking...' />
+              ) : (
+                'SUBMIT'
+              )}
+            </Button>
           </div>
-        )
-      )}
-
-      <div className='flex justify-between items-center'>
-        <Button variant='link' onClick={() => router.back()}>
-          GO BACK
-        </Button>
-        <Button className='bg-green-500 text-white' onClick={handleCorrectness}>
-          {markUserMutation.isPending ? <Loader text='Marking...' /> : 'SUBMIT'}
-        </Button>
-      </div>
-      {markUserMutation.isSuccess && (
-        <AlertDialog open={openDialog}>
-          <AlertDialogContent className='w-[380px] shadow'>
-            <AlertDialogHeader>
-              <AlertDialogTitle className='text-center text-2xl'>
-                Marks
-              </AlertDialogTitle>
-              <AlertDialogDescription className='text-center'>
-                You&apos;ve got{' '}
-                <span className='text-gray-600 text-2xl'>{average}/100</span>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setOpenDialog(false)}>
-                Close
-              </AlertDialogCancel>
-              <AlertDialogAction>See feedback</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          <AlertDialog open={openDialog}>
+            <AlertDialogContent className='w-[380px] shadow'>
+              <AlertDialogHeader>
+                <AlertDialogTitle className='text-center text-2xl'>
+                  Marks
+                </AlertDialogTitle>
+                <AlertDialogDescription className='text-center'>
+                  You&apos;ve got{' '}
+                  <span className='text-gray-600 text-2xl'>{average}/100</span>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setOpenDialog(false)}>
+                  Close
+                </AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       )}
     </div>
   )
