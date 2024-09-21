@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+export const maxDuration = 30
+
 export default function Home() {
   const { register, handleSubmit, setValue, getValues } = useForm<PromptType>({
     resolver: zodResolver(PromptSchema),
