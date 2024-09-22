@@ -11,6 +11,8 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ data, status: 200 })
 }
 
+export const maxDuration = 30
+
 export async function POST(req: NextRequest) {
   const { topic, description, difficulty, questionTypes } = await req.json()
 
